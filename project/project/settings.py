@@ -37,7 +37,8 @@ PROJECT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'graphene_django'
+    'graphene_django',
+    'django_filters'
 ]
 
 DJANGO_APPS = [

@@ -1,29 +1,38 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-from django.contrib.auth.models import User as UserModel
+from graphene_django.filter import DjangoFilterConnectionField
 
+from django.contrib.auth.models import User as UserModel
 from users.models import Profile as ProfileModel
 
 
-class ProfileType(DjangoObjectType):
+class ProfileNode(DjangoObjectType):
     """User profile type schema definition."""
 
     class Meta:
         model = ProfileModel
+        interfaces = (graphene.Node, )
+
+    @classmethod
+    def get_node(cls, info, id):
+        return ProfileModel.objects.get(pk=id)
 
 
-class UserType(DjangoObjectType):
+class UserNode(DjangoObjectType):
     """User type schema definition."""
 
     class Meta:
         model = UserModel
+        interfaces = (graphene.Node, )
+        filter_fields = ['username']
+
+    @classmethod
+    def get_node(cls, info, id):
+        return UserModel.objects.get(pk=id)
 
 
-class Query(graphene.AbstractType):
+class Query(object):
     """Users app query definition."""
 
-    users = graphene.List(UserType)
-
-    def resolve_users(self, info):
-        """Resolve `users` attribute."""
-        return UserModel.objects.all()
+    user = graphene.Node.Field(UserNode)
+    all_users = DjangoFilterConnectionField(UserNode)
